@@ -6,3 +6,4 @@ pydantic
 pydantic-settings
 python-multipart
 pysqlite3-binary
+pip install groq
