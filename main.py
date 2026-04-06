@@ -105,7 +105,7 @@ async def chat(query: Query):
 
         # D. Dual-Key & Multi-Model Failover Loop
         # Using fully qualified names to avoid 404s
-        model_priority = ["models/gemini-1.5-flash", "models/gemini-1.5-flash-8b"]
+        model_priority = ["gemini-1.5-flash", "gemini-2.0-flash"]
 
         for client_idx, gen_client in enumerate(clients):
             for model_id in model_priority:
@@ -115,17 +115,17 @@ async def chat(query: Query):
                         model=model_id,
                         contents=full_prompt
                     )
-                    if response:
+                    if response and response.text:
                         return {"response": response.text}
                 
                 except Exception as e:
                     error_msg = str(e)
+                    # If we hit a 404, it means the name is wrong; if 429, the quota is full.
                     logger.error(f"Fail: Client {client_idx + 1}, Model {model_id}: {error_msg}")
                     
-                    # If hit a Rate Limit (429), pause briefly before trying next
                     if "429" in error_msg:
-                        time.sleep(1)
-                    continue 
+                        time.sleep(1) # Short pause before switching keys
+                    continue
 
         return {"response": "All HITS system nodes are currently busy. Please try again in a moment or email **info@hindustanuniv.ac.in**."}
 
