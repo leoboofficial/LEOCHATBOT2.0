@@ -72,7 +72,7 @@ async def chat(query: Query):
         # We fetch 5 chunks to ensure we get detailed lab/date info
         results = collection.query(
             query_texts=[clean_query], 
-            n_results=5, 
+            n_results=10, 
             include=['documents']
         )
         
